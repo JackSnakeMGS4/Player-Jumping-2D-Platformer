@@ -28,6 +28,8 @@ namespace Player_Jumping_2D_Platformer
         private const double GRAVITY = .75;//used to bring the the player back to ground level at a constant rate
         private bool isPlayerJumping = false;//used to determine is the player is jumping
         private const int framesPerSecond = 120;//used to determine the rate at which the game updates (makes the game loop possible)
+        private const double fullXAxisRotation = 360;//will be used for player rotation on x-axis
+        private double rotateXAxis = 45;//will be used to rotate x-axis by 45 degrees
 
         public MainWindow()
         {
@@ -86,8 +88,16 @@ namespace Player_Jumping_2D_Platformer
                 //if player pressed space bar then this will hold true until isPlayerJumping becomes false
                 //next line adds playerSpeedY to playerY and set playerY to the new value. playerSpeedY is reset to 8 everytime the space bar is pressed
                 playerY += playerSpeedY;
+                //ANOTHER NOTE!!! See if you can figure out how to rotate the player when they jump
+                /*So you want to rotate the player 180 degrees as they go up and 180 degrees as they go down 
+                 * try using a while loop to rotate the square in small increments
+                 * try using the RotateTransform class and it's RenderTransform()
+                 * keep in mind that the property for rotation doesn't reset to 0 upon making a 360 degree turn
+                 * instead it goes to 720 
+                 */
+
                 //next substracts .75 from playerSpeedY and enables playerY to decrease
-                playerSpeedY -= GRAVITY;
+                playerSpeedY -= GRAVITY;               
                 //next statement checks if player hit the bottom on the canvas
                 if (PlayerHitGround())
                 {

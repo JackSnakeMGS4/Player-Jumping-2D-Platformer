@@ -16,7 +16,7 @@
             </Canvas.Background>
             <Rectangle x:Name="player" Height="50" Width="50" Stroke="Black" 
                        StrokeThickness="2" 
-                       Fill="Red" Canvas.Bottom="0" Canvas.Left="0"/>
+                       Fill="Red" Canvas.Bottom="0" Canvas.Left="0" RenderTransformOrigin="0.5,0.5"/>
         </Canvas>
     </Grid>
 </Window>
