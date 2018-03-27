@@ -47,7 +47,11 @@ namespace Player_Jumping_2D_Platformer
                 PlayerJumping();
             }
             //next line moves the player in accordance with variables
-            MovePlayer();                  
+            MovePlayer();   
+            /*note to self: I want to create two or three so I can prototype the player 
+             * jumping onto a platform and let them land on it and be able to fall off it 
+             * by moving past the platform's left or right boundaries
+             */
         }
 
         private bool PlayerJumping()
@@ -76,6 +80,7 @@ namespace Player_Jumping_2D_Platformer
                 playerSpeedX *= -1;
             }
             //next if statement changes the player's y position according to y-axis variable and GRAVITY
+            //need to find a way to prevent the player from escaping the canvas by jumping 
             if (isPlayerJumping)
             {
                 //if player pressed space bar then this will hold true until isPlayerJumping becomes false
