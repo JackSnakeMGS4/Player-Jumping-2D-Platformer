@@ -25,17 +25,21 @@ namespace Player_Jumping_2D_Platformer
         private double playerX;//is used to set the player's position on canvas x-axis
         private double playerY;//is used to set the player's position on canvas y-axis
         private double playerSpeedY;//used to determine player's jumping capability
+
         private const double GRAVITY = .75;//used to bring the the player back to ground level at a constant rate
         private bool isPlayerJumping = false;//used to determine is the player is jumping
+
         private const int framesPerSecond = 120;//used to determine the rate at which the game updates (makes the game loop possible)
-        private const double fullXAxisRotation = 360;//will be used for player rotation on x-axis
-        private double rotateXAxis = 45;//will be used to rotate x-axis by 45 degrees
+
+        private const double fullXAxisRotation = 0;//used to reset the player's x-axis rotation to 0
+        private double rotateXAxis = 0;//will be used to rotate x-axis
 
         public MainWindow()
         {
             InitializeComponent();
             playerX = Canvas.GetLeft(player);//sets playerX to 0 based on my choice
             playerY = Canvas.GetBottom(player);//sets playerY to 0 based on my choice
+
             DispatcherTimer update = new DispatcherTimer();
             update.Tick += Update_Tick;
             update.Interval = TimeSpan.FromMilliseconds(1000 / framesPerSecond);
@@ -48,8 +52,10 @@ namespace Player_Jumping_2D_Platformer
             {
                 PlayerJumping();
             }
+
             //next line moves the player in accordance with variables
             MovePlayer();   
+
             /*note to self: I want to create two or three so I can prototype the player 
              * jumping onto a platform and let them land on it and be able to fall off it 
              * by moving past the platform's left or right boundaries
@@ -81,30 +87,38 @@ namespace Player_Jumping_2D_Platformer
             {
                 playerSpeedX *= -1;
             }
+
             //next if statement changes the player's y position according to y-axis variable and GRAVITY
-            //need to find a way to prevent the player from escaping the canvas by jumping 
+            //need to find a way to prevent the player from escaping the canvas by jumping off the top
             if (isPlayerJumping)
             {
                 //if player pressed space bar then this will hold true until isPlayerJumping becomes false
                 //next line adds playerSpeedY to playerY and set playerY to the new value. playerSpeedY is reset to 8 everytime the space bar is pressed
                 playerY += playerSpeedY;
-                //ANOTHER NOTE!!! See if you can figure out how to rotate the player when they jump
-                /*So you want to rotate the player 180 degrees as they go up and 180 degrees as they go down 
-                 * try using a while loop to rotate the square in small increments
-                 * try using the RotateTransform class and it's RenderTransform()
-                 * keep in mind that the property for rotation doesn't reset to 0 upon making a 360 degree turn
-                 * instead it goes to 720 
+
+                /*So you want to rotate the player as they go up and down!?
+                 * Used RotateTransform and it's constructor to called a method to calculate the degree for rotation
                  */
+                RotateTransform rotate = new RotateTransform(RotatePlayer());
+
+                //next line reflects change calculated from RotatePlayer()
+                player.RenderTransform = rotate;
 
                 //next substracts .75 from playerSpeedY and enables playerY to decrease
-                playerSpeedY -= GRAVITY;               
+                playerSpeedY -= GRAVITY; 
+                
                 //next statement checks if player hit the bottom on the canvas
                 if (PlayerHitGround())
                 {
                     //if PlayerHitGround() return true then isPlayerJumping will be set to false and prevent playerY from being decreased
                     isPlayerJumping = false;
+
                     //next line sets playerY to 0 in order to prevent a bug where the player's bottom property is less than 0 and then shown on the game
                     playerY = 0;
+
+                    //next two lines are to prevent another visual bug where the player landed on a angle other than 180 or 360 or a multiple of either those
+                    RotateTransform resetRotation = new RotateTransform(fullXAxisRotation);
+                    player.RenderTransform = resetRotation;
                 }             
             }
           
@@ -122,6 +136,19 @@ namespace Player_Jumping_2D_Platformer
             }
             
             return false;
+        }
+
+        private double RotatePlayer()
+        {
+            //next line sets the amount to rotate the player by
+            double rotateBy = 22.5;
+            if (isPlayerJumping)//fires while isPlayerJumping is true
+            {
+                //adds 22.5 to rotateXAxis
+                rotateXAxis += rotateBy;
+            }
+            //next line returns the end result of the calculation from above
+            return rotateXAxis;
         }
     }
 }
