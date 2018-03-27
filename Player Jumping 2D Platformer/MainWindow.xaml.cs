@@ -21,19 +21,19 @@ namespace Player_Jumping_2D_Platformer
     /// </summary>
     public partial class MainWindow : Window
     {
-        private double playerSpeedX = 7;
-        private double playerX;
-        private double playerY;
-        private double playerSpeedY;
-        private const double GRAVITY = .75;
-        private bool isPlayerJumping = false;
-        private const int framesPerSecond = 120;
+        private double playerSpeedX = 7;//sets player's left and right speed
+        private double playerX;//is used to set the player's position on canvas x-axis
+        private double playerY;//is used to set the player's position on canvas y-axis
+        private double playerSpeedY;//used to determine player's jumping capability
+        private const double GRAVITY = .75;//used to bring the the player back to ground level at a constant rate
+        private bool isPlayerJumping = false;//used to determine is the player is jumping
+        private const int framesPerSecond = 120;//used to determine the rate at which the game updates (makes the game loop possible)
 
         public MainWindow()
         {
             InitializeComponent();
-            playerX = Canvas.GetLeft(player);//sets playerX to 0
-            playerY = Canvas.GetBottom(player);//sets playerY to 0
+            playerX = Canvas.GetLeft(player);//sets playerX to 0 based on my choice
+            playerY = Canvas.GetBottom(player);//sets playerY to 0 based on my choice
             DispatcherTimer update = new DispatcherTimer();
             update.Tick += Update_Tick;
             update.Interval = TimeSpan.FromMilliseconds(1000 / framesPerSecond);
@@ -42,15 +42,19 @@ namespace Player_Jumping_2D_Platformer
 
         private void Update_Tick(object sender, EventArgs e)
         {
-            if (Keyboard.IsKeyDown(Key.Space))
+            if (Keyboard.IsKeyDown(Key.Space))//only fires if the space bar is pressed or held down
             {
                 PlayerJumping();
             }
+            //next line moves the player in accordance with variables
             MovePlayer();                  
         }
 
         private bool PlayerJumping()
         {
+            /* if the player is pressing or holding down the space bar then isPlayerJumping is set to true
+             * playerSpeedY is set to 8 and return the value of isPlayerJumping
+             */
             isPlayerJumping = true;
             playerSpeedY = 8;
             return isPlayerJumping;
@@ -58,6 +62,10 @@ namespace Player_Jumping_2D_Platformer
 
         private void MovePlayer()
         {
+            /* next three statements move the player left or right depending on the situation
+             * playerX = playerX + playerSpeedX where playerSpeedX is 7 and playerX is the current value of the player's
+             * left property
+             */
             playerX += playerSpeedX;
             if (playerX > gameCanvas.Width - player.Width)
             {
@@ -67,27 +75,37 @@ namespace Player_Jumping_2D_Platformer
             {
                 playerSpeedX *= -1;
             }
+            //next if statement changes the player's y position according to y-axis variable and GRAVITY
             if (isPlayerJumping)
             {
+                //if player pressed space bar then this will hold true until isPlayerJumping becomes false
+                //next line adds playerSpeedY to playerY and set playerY to the new value. playerSpeedY is reset to 8 everytime the space bar is pressed
                 playerY += playerSpeedY;
+                //next substracts .75 from playerSpeedY and enables playerY to decrease
                 playerSpeedY -= GRAVITY;
+                //next statement checks if player hit the bottom on the canvas
                 if (PlayerHitGround())
                 {
+                    //if PlayerHitGround() return true then isPlayerJumping will be set to false and prevent playerY from being decreased
                     isPlayerJumping = false;
+                    //next line sets playerY to 0 in order to prevent a bug where the player's bottom property is less than 0 and then shown on the game
                     playerY = 0;
                 }             
             }
           
+            //next two lines set the player's position according to the calculation's performed above
             Canvas.SetLeft(player, playerX);
             Canvas.SetBottom(player, playerY);
         }
 
         private bool PlayerHitGround()
         {
+            //if statement will fire when playerY is less than 0 and returns true
             if (playerY < 0)
             {
                 return true;
             }
+            
             return false;
         }
     }
