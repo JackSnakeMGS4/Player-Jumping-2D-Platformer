@@ -1,0 +1,22 @@
+﻿<Window x:Class="Player_Jumping_2D_Platformer.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Player_Jumping_2D_Platformer"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="400" Width="800">
+    <Grid>
+        <Canvas x:Name="gameCanvas" Height="350" Width="750">
+            <Canvas.Background>
+                <LinearGradientBrush EndPoint="0.2,1" StartPoint="0.7,0">
+                    <GradientStop Color="#ff4803" Offset=".2"/>
+                    <GradientStop Color="Blue" Offset="1.5"/>
+                </LinearGradientBrush>
+            </Canvas.Background>
+            <Rectangle x:Name="player" Height="50" Width="50" Stroke="Black" 
+                       StrokeThickness="2" 
+                       Fill="Red" Canvas.Bottom="0" Canvas.Left="0"/>
+        </Canvas>
+    </Grid>
+</Window>
