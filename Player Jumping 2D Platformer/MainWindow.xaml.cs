@@ -34,6 +34,12 @@ namespace Player_Jumping_2D_Platformer
         private const double fullXAxisRotation = 0;//used to reset the player's x-axis rotation to 0
         private double rotateXAxis = 0;//will be used to rotate x-axis
 
+        /*So you want to rotate the player as they go up and down!?
+         * Used RotateTransform
+         */
+        private RotateTransform rotate = new RotateTransform();
+        private RotateTransform resetRotation = new RotateTransform(fullXAxisRotation);
+
         public MainWindow()
         {
             InitializeComponent();
@@ -56,7 +62,7 @@ namespace Player_Jumping_2D_Platformer
             //next line moves the player in accordance with variables
             MovePlayer();   
 
-            /*note to self: I want to create two or three so I can prototype the player 
+            /*note to self: I want to create two or three platforms so I can prototype the player 
              * jumping onto a platform and let them land on it and be able to fall off it 
              * by moving past the platform's left or right boundaries
              */
@@ -89,42 +95,64 @@ namespace Player_Jumping_2D_Platformer
             }
 
             //next if statement changes the player's y position according to y-axis variable and GRAVITY
-            //need to find a way to prevent the player from escaping the canvas by jumping off the top
-            if (isPlayerJumping)
+            if (isPlayerJumping && !PlayerHitCeiling())
             {
-                //if player pressed space bar then this will hold true until isPlayerJumping becomes false
+                //if player pressed space bar then this will hold true until isPlayerJumping becomes false and player has not hit ceiling
                 //next line adds playerSpeedY to playerY and set playerY to the new value. playerSpeedY is reset to 8 everytime the space bar is pressed
                 playerY += playerSpeedY;
 
-                /*So you want to rotate the player as they go up and down!?
-                 * Used RotateTransform and it's constructor to called a method to calculate the degree for rotation
-                 */
-                RotateTransform rotate = new RotateTransform(RotatePlayer());
+                //next line calls RotatePlayer() to calculate the angle for rotate
+                rotate.Angle = RotatePlayer();
 
                 //next line reflects change calculated from RotatePlayer()
                 player.RenderTransform = rotate;
 
                 //next substracts .75 from playerSpeedY and enables playerY to decrease
-                playerSpeedY -= GRAVITY; 
-                
-                //next statement checks if player hit the bottom on the canvas
-                if (PlayerHitGround())
-                {
-                    //if PlayerHitGround() return true then isPlayerJumping will be set to false and prevent playerY from being decreased
-                    isPlayerJumping = false;
-
-                    //next line sets playerY to 0 in order to prevent a bug where the player's bottom property is less than 0 and then shown on the game
-                    playerY = 0;
-
-                    //next two lines are to prevent another visual bug where the player landed on a angle other than 180 or 360 or a multiple of either those
-                    RotateTransform resetRotation = new RotateTransform(fullXAxisRotation);
-                    player.RenderTransform = resetRotation;
-                }             
+                playerSpeedY -= GRAVITY;           
+            }            
+            //next statement checks if player has hit the ceiling
+            else if (PlayerHitCeiling())
+            {
+                /*since playerY is reset to 8 everytime space is pressed then substracting playerSpeedY wouldn't work 
+                 * since it is far less than playerY because of the calculations performed in the previous if statement
+                 * the solution is to instead substract by GRAVITY multiplied by whatever number you choose
+                 * which works since it will always run when the playerY is greater than the canvas height - player height
+                 * note that this if/else if causes what may appear to be a bug when the hitting the ceiling, but remember
+                 * that physics are in effect. think of a human running into a pole! they wouldn't just stop immediately, 
+                 * instead the collision will have this rebound effect. Don't believe me? Try it! Go run into a wall or a pole 
+                 * as fast as you can and see if you actually stop instantenously
+                 */
+                playerY -= GRAVITY * 10;
             }
-          
+
+            //next statement checks if player hit the bottom on the canvas
+            if (PlayerHitGround())
+            {
+                //if PlayerHitGround() return true then isPlayerJumping will be set to false and prevent playerY from being decreased
+                isPlayerJumping = false;
+
+                //next line sets playerY to 0 in order to prevent a bug where the player's bottom property is less than 0 and then shown on the game
+                playerY = 0;
+
+                //next line prevents another visual bug where the player landed on a angle other than 180 or 360 or a multiple of either those               
+                player.RenderTransform = resetRotation;
+            }
+
             //next two lines set the player's position according to the calculation's performed above
             Canvas.SetLeft(player, playerX);
             Canvas.SetBottom(player, playerY);
+        }
+
+        private bool PlayerHitCeiling()
+        {
+            if (playerY > gameCanvas.Height - player.Height)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         private bool PlayerHitGround()
