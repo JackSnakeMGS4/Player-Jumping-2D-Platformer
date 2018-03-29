@@ -23,6 +23,7 @@ namespace Player_Jumping_2D_Platformer
     {
         private double playerSpeedX = 7;//sets player's left and right speed
         private double playerX;//is used to set the player's position on canvas x-axis
+        private double playerCenterX;//this is the middle point of the player's object
         private double playerY;//is used to set the player's position on canvas y-axis
         private double playerSpeedY;//used to determine player's jumping capability
 
@@ -40,11 +41,18 @@ namespace Player_Jumping_2D_Platformer
         private RotateTransform rotate = new RotateTransform();
         private RotateTransform resetRotation = new RotateTransform(fullXAxisRotation);
 
+        //here goes the platform location
+        private double platformY;
+        private double platformX;
+
         public MainWindow()
         {
             InitializeComponent();
-            playerX = Canvas.GetLeft(player);//sets playerX to 0 based on my choice
+            playerX = Canvas.GetLeft(player);//sets playerX to 0 based on my choice            
             playerY = Canvas.GetBottom(player);//sets playerY to 0 based on my choice
+
+            platformX = Canvas.GetLeft(platform);//sets platformX to 275
+            platformY = Canvas.GetBottom(platform);//sets platformY to 15 
 
             DispatcherTimer update = new DispatcherTimer();
             update.Tick += Update_Tick;
@@ -60,12 +68,7 @@ namespace Player_Jumping_2D_Platformer
             }
 
             //next line moves the player in accordance with variables
-            MovePlayer();   
-
-            /*note to self: I want to create two or three platforms so I can prototype the player 
-             * jumping onto a platform and let them land on it and be able to fall off it 
-             * by moving past the platform's left or right boundaries
-             */
+            MovePlayer();         
         }
 
         private bool PlayerJumping()
@@ -85,11 +88,15 @@ namespace Player_Jumping_2D_Platformer
              * left property
              */
             playerX += playerSpeedX;
-            if (playerX > gameCanvas.Width - player.Width)
+            /*next line sets playerCenterX to the current location of the player plus half their 
+             *width to get the actual center point and keeps it updated
+             */
+            playerCenterX = playerX + (player.Width / 2);
+            if (playerX >= gameCanvas.Width - player.Width)
             {
                 playerSpeedX *= -1;
             }
-            if (playerX < 0)
+            if (playerX <= 0)
             {
                 playerSpeedX *= -1;
             }
@@ -108,7 +115,7 @@ namespace Player_Jumping_2D_Platformer
                 player.RenderTransform = rotate;
 
                 //next substracts .75 from playerSpeedY and enables playerY to decrease
-                playerSpeedY -= GRAVITY;           
+                playerSpeedY -= GRAVITY;          
             }            
             //next statement checks if player has hit the ceiling
             else if (PlayerHitCeiling())
@@ -120,15 +127,41 @@ namespace Player_Jumping_2D_Platformer
                  * note that this if/else if causes what may appear to be a bug when the hitting the ceiling, but remember
                  * that physics are in effect. think of a human running into a pole! they wouldn't just stop immediately, 
                  * instead the collision will have this rebound effect. Don't believe me? Try it! Go run into a wall or a pole 
-                 * as fast as you can and see if you actually stop instantenously
+                 * as fast as you can and see if you actually stop instantenously!
                  */
-                playerY -= GRAVITY * 10;
+                playerY -= (GRAVITY * 10);
             }
+            /*note to self: I want to create two or three platforms so I can prototype the player 
+             * jumping onto a platform and let them land on it and be able to fall off it 
+             * by moving past the platform's left or right boundaries
+             */
+            //next else if checks if player is outside the horizontal boundaries of the platform
+            else if (PlayerIsFallingOffPlatform())
+            {
+                //if it is then it just makes them fall
+                playerY -= (GRAVITY * 10);
+            }
+
+            //next if statement checks if player is on the platform
+            if (PlayerIsOnPlatform())
+            {
+                /* if player is on platform then isPlayerJumping will be set to false
+                 * which will prevent the player from continuing to fall despite landing on the platform
+                 * playerY is then set to platformY + it's height and also reset the rotation angle
+                 * to correctly display travel across the platform
+                 */
+                isPlayerJumping = false;
+
+                playerY = platformY + platform.Height;
+
+                player.RenderTransform = resetRotation;
+            }
+
 
             //next statement checks if player hit the bottom on the canvas
             if (PlayerHitGround())
             {
-                //if PlayerHitGround() return true then isPlayerJumping will be set to false and prevent playerY from being decreased
+                //if PlayerHitGround() returns true then isPlayerJumping will be set to false and prevent playerY from decreasing and prevent the player from falling through
                 isPlayerJumping = false;
 
                 //next line sets playerY to 0 in order to prevent a bug where the player's bottom property is less than 0 and then shown on the game
@@ -143,8 +176,23 @@ namespace Player_Jumping_2D_Platformer
             Canvas.SetBottom(player, playerY);
         }
 
+        private bool PlayerIsFallingOffPlatform()
+        {
+            /*checks if player's center point (which is set and reset as soon as the
+             * player actually lands on the platform) on the x-axis is less than the
+             * platform's left boundary or if it's greater than the platform's 
+             * right boundary
+             */
+            if (playerCenterX < platformX || playerCenterX > platformX + platform.Width)
+            {
+                return true;
+            }
+            return false;
+        }
+
         private bool PlayerHitCeiling()
         {
+            //checks if playerY is greater than the canvas height - the player's height (350)
             if (playerY > gameCanvas.Height - player.Height)
             {
                 return true;
@@ -177,6 +225,18 @@ namespace Player_Jumping_2D_Platformer
             }
             //next line returns the end result of the calculation from above
             return rotateXAxis;
+        }
+
+        private bool PlayerIsOnPlatform()
+        {
+            /* checks if player's center point on x-axis and their feet are 
+             * within the platform's dimensions
+             */          
+            if ((playerY > platformY && playerY < platformY + platform.Height) && (playerCenterX >= platformX && playerCenterX <= platformX + platform.Width))
+            {
+                return true;
+            }
+            return false;
         }
     }
 }
