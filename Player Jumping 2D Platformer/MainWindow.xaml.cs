@@ -29,6 +29,8 @@ namespace Player_Jumping_2D_Platformer
 
         private const double GRAVITY = .75;//used to bring the the player back to ground level at a constant rate
         private bool isPlayerJumping = false;//used to determine is the player is jumping
+        private int numberOfTimesJumped = 0;//used to counts how many small jumps the player has made
+        private const int numberOfJumpsAllowed = 3;//limit of how many jumps are allowed
 
         private const int framesPerSecond = 120;//used to determine the rate at which the game updates (makes the game loop possible)
 
@@ -62,13 +64,19 @@ namespace Player_Jumping_2D_Platformer
 
         private void Update_Tick(object sender, EventArgs e)
         {
-            if (Keyboard.IsKeyDown(Key.Space))//only fires if the space bar is pressed or held down
-            {
-                PlayerJumping();
-            }
-
             //next line moves the player in accordance with variables
             MovePlayer();         
+        }
+
+        private void Window_KeyDown(object sender, KeyEventArgs e)
+        {
+            //I fucking got it!!!!!!!!!!!! Good thing I listened to my gut. Just needed to create an event handler on XAML and then mess with it here
+            if (e.Key == Key.Space && !e.IsRepeat && numberOfTimesJumped < numberOfJumpsAllowed)
+            {
+                //Ok so this will only let the player jumps 3 times while the times jumped is 3
+                //the numberOfTimesJumped will be reset upon landing on the ground or platform to enable more jumping!
+                PlayerJumping();
+            }
         }
 
         private bool PlayerJumping()
@@ -78,6 +86,7 @@ namespace Player_Jumping_2D_Platformer
              */
             isPlayerJumping = true;
             playerSpeedY = 8;
+            numberOfTimesJumped++;
             return isPlayerJumping;
         }
 
@@ -131,10 +140,7 @@ namespace Player_Jumping_2D_Platformer
                  */
                 playerY -= (GRAVITY * 10);
             }
-            /*note to self: I want to create two or three platforms so I can prototype the player 
-             * jumping onto a platform and let them land on it and be able to fall off it 
-             * by moving past the platform's left or right boundaries
-             */
+
             //next else if checks if player is outside the horizontal boundaries of the platform
             else if (PlayerIsFallingOffPlatform())
             {
@@ -155,6 +161,8 @@ namespace Player_Jumping_2D_Platformer
                 playerY = platformY + platform.Height;
 
                 player.RenderTransform = resetRotation;
+
+                numberOfTimesJumped = 0;
             }
 
 
@@ -169,6 +177,8 @@ namespace Player_Jumping_2D_Platformer
 
                 //next line prevents another visual bug where the player landed on a angle other than 180 or 360 or a multiple of either those               
                 player.RenderTransform = resetRotation;
+
+                numberOfTimesJumped = 0;
             }
 
             //next two lines set the player's position according to the calculation's performed above
@@ -237,6 +247,6 @@ namespace Player_Jumping_2D_Platformer
                 return true;
             }
             return false;
-        }
+        }        
     }
 }

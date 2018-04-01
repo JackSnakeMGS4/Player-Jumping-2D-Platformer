@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Player_Jumping_2D_Platformer"
         mc:Ignorable="d"
-        Title="MainWindow" Height="400" Width="800">
+        Title="MainWindow" Height="400" Width="800" KeyDown="Window_KeyDown">
     <Grid>
         <Canvas x:Name="gameCanvas" Height="350" Width="750">
             <Canvas.Background>
